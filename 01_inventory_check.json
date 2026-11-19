@@ -1,0 +1,131 @@
+# n8n-learning-labs
+Practical n8n automation workflows, API integrations, and supply chain logic labs.
+{
+  "nodes": [
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.manualTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "97375ab3-abb2-4b82-8918-932d35225cf1",
+      "name": "When clicking ‘Execute workflow’"
+    },
+    {
+      "parameters": {
+        "jsCode": "return [\n  { json: { item: \"Тушонка\", stock: 300, min_norm: 250 } },\n  { json: { item: \"Цукор\", stock: 80, min_norm: 100 } },\n  { json: { item: \"Борошно\", stock: 500, min_norm: 400 } }\n];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        224,
+        0
+      ],
+      "id": "5964b0a6-c52d-4b82-ae75-31c511445034",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 4
+          },
+          "conditions": [
+            {
+              "id": "493e0735-be79-45b7-99b6-95705145aad9",
+              "leftValue": "={{ $json.stock }}",
+              "rightValue": "={{ $json.min_norm }}",
+              "operator": {
+                "type": "number",
+                "operation": "lt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.4,
+      "position": [
+        448,
+        0
+      ],
+      "id": "d0b7bd57-1f95-4fd5-8432-c11f906174a2",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "76913e13-ef56-48f8-aef9-7d65ae4d9b0a",
+              "name": "order_needed",
+              "value": "={{ $json.min_norm * 2 - $json.stock }}",
+              "type": "number"
+            },
+            {
+              "id": "442d5b65-3fad-43f4-bc5d-37956e6990b5",
+              "name": "alert_text",
+              "value": "=Увага! Критичний залишок: {{ $json.item }}. На складі: {{ $json.stock }}. Потрібно замовити: {{ $json.min_norm * 2 - $json.stock }} кг",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.5,
+      "position": [
+        672,
+        -96
+      ],
+      "id": "e49400e1-b49a-4cb9-aef1-f73bc408eb2f",
+      "name": "Edit Fields"
+    }
+  ],
+  "connections": {
+    "When clicking ‘Execute workflow’": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "pinData": {},
+  "meta": {
+    "instanceId": "0e11b84a7d80d2a2200ef215335ce84e64be7617be37c46e6655246e1b2dfe4b"
+  }
+}
